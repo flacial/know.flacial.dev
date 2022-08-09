@@ -1,0 +1,226 @@
+---
+title: add-exercise page
+path: /knowledge/c0d3/pages
+date: 2022-08-08
+---
+
+import MarkdownWrapper from '../../../../components/MarkdownWrapper'
+import Layout from '../../../../components/Layout'
+
+<Layout>
+<MarkdownWrapper>
+
+# Creating the add-exercise page
+
+### Pre-dev
+
+Create a mini design doc that goes through the things that need to be made or thought of before creating the page.
+
+[The mini design doc for this page](../docs/add_exercise_docs)
+
+
+#### Data
+
+This page will have features like listing all the modules for a specific lesson and ultimately used to add exercises.
+
+Before coding, you need to find what data this page needs. In our case, we need to get all the lessons and each lesson's modules.
+
+We need the lessons to filter them and find the lesson that has the slug of the URL's param `lessonSlug` value.
+
+The modules will be listed in the Dropdown menu, and later used to set the module to the exercise we want to add belongs to.
+
+Before finding the way to get the `lessons`, we'll have to update the [lessons resolver](https://github.com/garageScript/c0d3-app/blob/64f3ed6ed1fd10bc7c66f772421faff8463e8009/graphql/resolvers/lessons.ts) first to include the `modules`:
+
+```javascript
+// graphql/resolvers/lessons.ts
+export const lessons = () => {
+  return prisma.lesson.findMany({
+    include: {
+      challenges: { orderBy: { order: 'asc' } },
+      modules: { orderBy: { order: 'asc' } }
+    },
+    orderBy: {
+      order: 'asc'
+    }
+  })
+}
+```
+
+We'll be using `withGetAppQuery` that gets the data we need `lessons` (and a bunch of others) and pass it to the component `withGetAppQuery()(Component)`. In the component, we will extract the `data` from the parameters and set its type as `AppQueryProps`:
+
+```tsx
+const Component = ({ data }: AppQueryProps) => {}
+
+withGetAppQuery()(Component)
+```
+
+#### Structure
+
+##### Dropdown menu
+
+The `Dropdown` menu will be used to switch between the modules. The selected module will be stored in the parent state as we'll later need it when executing the `createExercise` mutation.
+
+We need to consider the following cases before coding it:
+- Should we display the lesson's first module or make the user set the module they want to add an exercise to?
+    - Make the user set the module because there's a chance the user might create an exercise for the default by accident.
+- What happens if the user didn't select a module?
+    - Show them an error that explains how they need to select a module to add an exercise to it.
+
+We found out we already have a `DropdownMenu` component in our components library. Instead of creating a new one, we chose to refactor and restyle it.
+
+The `DropdownMenu` should have the following features for it to work for us:
+
+1. Set the select item as the active one
+2. When an item is clicked, run the item's callback function `item.onClick` that will set the parent component's `module` state with the `item`
+
+Before:
+
+```tsx
+// DropdownMenu
+
+export type Item = {
+  title: string
+  path?: string
+  as?: 'a' | 'button'
+  onClick?: Function
+} | null
+
+type DropDownMenuProps = {
+  drop?: DropDirection
+  items: Item[]
+  title: string
+  size?: 'sm' | 'lg' | undefined
+  variant?:
+    | 'primary'
+    | 'secondary'
+    | 'success'
+    | 'info'
+    | 'warning'
+    | 'danger'
+    | 'none'
+  //changes the underlying component CSS base class name
+  //https://react-bootstrap.github.io/components/dropdowns/#api
+  bsPrefix?: string
+}
+
+export const DropdownMenu: React.FC<DropDownMenuProps> = ({
+  drop = 'down',
+  variant = 'none',
+  title,
+  size,
+  items,
+  bsPrefix
+}) => {
+  const menuItems = items.map((item: Item, itemsIndex: number) =>
+    !item ? (
+      <Dropdown.Divider key={itemsIndex} />
+    ) : (
+      <div className="text-center py-2 px-4" key={item.title}>
+        <Dropdown.Item
+          as={item.as || 'a'}
+          key={itemsIndex}
+          href={item.path}
+          onClick={() => item.onClick && item.onClick(item.title)}
+          bsPrefix={bsPrefix}
+        >
+          {item.title}
+        </Dropdown.Item>
+      </div>
+    )
+  )
+
+  return (
+    <>
+      <div className="d-none d-lg-block">
+        <DropdownButton
+          title={title}
+          variant={variant}
+          size={size}
+          drop={drop}
+          bsPrefix={styles.title}
+        >
+          {menuItems}
+        </DropdownButton>
+      </div>
+      <div className="d-lg-none">{menuItems}</div>
+    </>
+  )
+}
+```
+
+After:
+
+```tsx
+export type Item = {
+  title?: string
+  name: string
+  path?: string
+  as?: 'a' | 'button'
+  onClick?: Function
+}
+
+type DropDownMenuProps = {
+  drop?: DropDirection
+  items?: Item[] | null
+  title?: string
+  customTitle?: string
+  size?: 'sm' | 'lg' | undefined
+  variant?:
+    | 'primary'
+    | 'secondary'
+    | 'success'
+    | 'info'
+    | 'warning'
+    | 'danger'
+    | 'none'
+  //changes the underlying component CSS base class name
+  //https://react-bootstrap.github.io/components/dropdowns/#api
+  bsPrefix?: string
+}
+
+const ChevronRight = () => <ChevronRightIcon size={17} />
+
+export const DropdownMenu: React.FC<DropDownMenuProps> = ({
+  items,
+  title,
+  customTitle
+}) => {
+  const [activeItem, setActiveItem] = useState({
+    name: title || customTitle
+  })
+
+  return (
+    <Dropdown>
+      <Dropdown.Toggle bsPrefix={styles.dropdown} id="dropdown-lesson">
+        {activeItem.name || 'None'}
+        <ChevronRight />
+      </Dropdown.Toggle>
+
+      <Dropdown.Menu className={styles.dropdown__menu}>
+        {items?.map((item, index) => (
+          <Dropdown.Item
+            key={`${item?.name}-${index}`}
+            onClick={() => {
+              item?.onClick && item.onClick(item)
+
+              setActiveItem({
+                name: item?.name
+              })
+            }}
+          >
+            {item?.name}
+          </Dropdown.Item>
+        ))}
+      </Dropdown.Menu>
+    </Dropdown>
+  )
+}
+```
+
+Main differences:
+- Remove most of the component props as they're not used in any other reference of the component
+- Add a `customTitle` to pass in a custom title (this is the exact same as `title`)
+- Refactor the component so it sets the selected item as the active one by calling `item.onClick` callback function
+
+</MarkdownWrapper>
+</Layout>

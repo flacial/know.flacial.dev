@@ -1,0 +1,97 @@
+---
+title: add-exercise page docs
+path: /knowledge/c0d3/docs
+date: 2022-08-08
+---
+
+import MarkdownWrapper from '../../../../components/MarkdownWrapper'
+import Layout from '../../../../components/Layout'
+
+<Layout>
+<MarkdownWrapper>
+
+# Exercise page design (#1975)
+
+## Components
+
+### Dropdown to switch the module
+
+![](media/16595322784961/16595323424364.jpg)
+
+If there's a `moduleId` in the URL params, set it as the default module. Else, query a list of modules for `lessonSlug` and list them. Set the first module as the default one.
+
+**Shape:**
+
+```tsx
+// Get moduleId and lessonSlug from URL
+const { moduleId } = router.query
+
+// States
+const [activeModule, setActiveModule] = useState(moduleId)
+const filteredModule = modules.filter(
+    ... => module.lesson.slug === lessonSlug
+)
+
+<DropdownMenu ...  />
+
+// DropdownMenu example Impl
+const DropDownMenu = (filteredModules, activeModule, setActiveModule) => {
+  return (
+      <Dropdown>
+        <Dropdown.Toggle>
+          {activeModule.title}
+        </Dropdown.Toggle>
+        <Dropdown.Menu>
+          {filteredModules?.map((module, index) => (
+            <Dropdown.Item onClick={() => setActiveModule(module)}>
+              {module.title}
+            </Dropdown.Item>
+          ))}
+        </Dropdown.Menu>
+      </Dropdown>
+  )
+}
+```
+
+**Questions**:
+
+- ~~What happens if the `moduleId` in the URL is invalid?~~
+- What if there are 100 modules? 
+    - How to list them?
+        - Add an input where they can see a list of modules and search for one.
+- ~~What if the module got renamed while another eng is trying to add an exercise to it?~~
+    - We use the `moduleId` to find the right module to add an exercise to.
+
+
+### Exaplantion & Question inputs
+
+![](media/16595322784961/16595345483809.jpg)
+![](media/16595322784961/16595363160396.jpg)
+
+Use [mdInput](https://github.com/garageScript/c0d3-app/blob/f50e1dbd245678b078d55cbef5d130ec0f4fd9be/components/MdInput.tsx). There will be a state that will be updated with the value the input has.
+
+
+### Answer radio inputs
+
+![](media/16595322784961/16598772910130.jpg)
+
+**Shape:**
+
+Regular input
+
+~~Look into using formik [`useFormik` hook](https://formik.org/docs/api/useFormik). It'll simplify the code as with the current shape, we'll have to pass 3 `setState` actions, and 3 `reactive` values.~~
+
+**Questions:**
+
+- ~~How to figure out if no answer was chosen as the correct answer?~~
+    - Where should the error message appear?
+        - Above the inputs
+
+### Submit button
+
+![](media/16595322784961/16595364402810.jpg)
+
+Once clicked, it'll run [useAddExercise](https://github.com/garageScript/c0d3-app/blob/af998122ba4e170a4d158e8478b9ed38fa3f192d/graphql/resolvers/exerciseCrud.ts#L25) with the inputs values. An object could be used to hold all the values.
+
+</MarkdownWrapper>
+</Layout>
