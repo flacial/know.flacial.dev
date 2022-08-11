@@ -31,7 +31,7 @@ The modules will be listed in the Dropdown menu, and later used to set the modul
 
 Before finding the way to get the `lessons`, we'll have to update the [lessons resolver](https://github.com/garageScript/c0d3-app/blob/64f3ed6ed1fd10bc7c66f772421faff8463e8009/graphql/resolvers/lessons.ts) first to include the `modules`:
 
-```javascript
+```ts
 // graphql/resolvers/lessons.ts
 export const lessons = () => {
   return prisma.lesson.findMany({
@@ -52,6 +52,37 @@ We'll be using `withGetAppQuery` that gets the data we need `lessons` (and a bun
 const Component = ({ data }: AppQueryProps) => {}
 
 withGetAppQuery()(Component)
+```
+
+The hook for mutation to add an exercise didn't exist (code-gen requires us to create a type defintion with `gql` for each mutation/query in order to create a hook for it), so we had to create a file under `graphql/queries` called `addExercise.ts` that will have the following type definition.
+
+```ts
+import { gql } from '@apollo/client'
+
+const ADD_EXERCISE = gql`
+  mutation addExercise(
+    $moduleId: Int!
+    $description: String!
+    $answer: String!
+    $testStr: String
+    $explanation: String
+  ) {
+    addExercise(
+      moduleId: $moduleId
+      description: $description
+      answer: $answer
+      testStr: $testStr
+      explanation: $explanation
+    ) {
+      id
+      description
+      answer
+      explanation
+    }
+  }
+`
+
+export default ADD_EXERCISE
 ```
 
 #### Structure
@@ -221,6 +252,19 @@ Main differences:
 - Remove most of the component props as they're not used in any other reference of the component
 - Add a `customTitle` to pass in a custom title (this is the exact same as `title`)
 - Refactor the component so it sets the selected item as the active one by calling `item.onClick` callback function
+
+
+##### Inputs
+
+For the inputs, we chose to use the `FormCard` component from the components library. This component takes an array of objects. Each object represents the input `type`, `value`, and `title`. The input could be a markdown input or a regular input.
+
+It all went fine except the part of not creating an execrise when one of the inputs is invalid.
+
+`FormCard` has a submit button that we could pass to it our logic when it's clicked. This function executes what you pass without validating the inputs first. 
+
+One solution we thought of is to abuse the `formChange` helper and run it for each input before adding the exercise. This method will validate each input and set its error message if it's invalid.
+
+THe solution works, but it's not ideal. The component `FormCard` must be modified to validate each input before submitting. Therefore, we chose to add this feature to `FormCard` first.
 
 </MarkdownWrapper>
 </Layout>
