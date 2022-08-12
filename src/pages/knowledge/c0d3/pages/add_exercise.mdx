@@ -256,15 +256,72 @@ Main differences:
 
 ##### Inputs
 
-For the inputs, we chose to use the `FormCard` component from the components library. This component takes an array of objects. Each object represents the input `type`, `value`, and `title`. The input could be a markdown input or a regular input.
+For the inputs, we chose to use the `FormCard` component from the components library. This component takes an array of objects. Each object represents the input's `type`, `value`, and `title`. The input could be a markdown input or a regular input.
 
 It all went fine except the part of not creating an execrise when one of the inputs is invalid.
 
 `FormCard` has a submit button that we could pass to it our logic when it's clicked. This function executes what you pass without validating the inputs first. 
 
-One solution we thought of is to abuse the `formChange` helper and run it for each input before adding the exercise. This method will validate each input and set its error message if it's invalid.
+One solution we used is to run the `formChange` helper for each input before adding the exercise. This method will validate each input and set its error message if it's invalid.
 
-THe solution works, but it's not ideal. The component `FormCard` must be modified to validate each input before submitting. Therefore, we chose to add this feature to `FormCard` first.
+```ts
+  const handleChange = async (value: string, propertyIndex: number) => {
+    await formChange(
+      value, // Input value
+      propertyIndex, // Input index
+      formOptions, // All inputs object
+      setFormOptions, // SetState action to update the inputs
+      exercisesValidation // Validation schema
+    )
+  }
+  
+  const onClick = () => {
+    try {
+      /*
+      With how handleChange work, it'll run the exercisesValidation with each input and display its error message if it's invalid
+      */
+      formOptions.forEach((form, index) => {
+        handleChange(form.value, index)
+      })
+
+      // ....
+
+      // ...
+      
+      // ...
+    } catch (err) {
+      // ...
+    }
+  }
+```
+
+
+##### Creating an exercise (submit)
+
+After we made sure the inputs show an error message when they're invalid. We can now work on the logic of creating the exercise.
+
+The solution to show the error message for each input if it's invalid doesn't prevent the submit button from being executed when one of the inputs is empty.
+
+To solve it, we created a check that goes through each input and validate if it's not empty. If all of them are not empty, submit, else show an error.
+
+```ts
+  const onClick = () => {
+    try {
+      // ...
+
+      const validateInputs = formOptions.every(form => form.value)
+
+      // ...
+      
+      // If all the inputs are not empty, add an exercise
+      if (validateInputs) {
+        return addExercise()
+      }
+    } catch (err) {
+      // ...
+    }
+  }
+```
 
 </MarkdownWrapper>
 </Layout>
