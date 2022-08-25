@@ -3,6 +3,12 @@ import { MDXProvider } from "@mdx-js/react"
 import styled from 'styled-components'
 import vsLight from 'prism-react-renderer/themes/nightOwlLight';
 
+const H1Styled = styled.h1`
+  border-bottom: 3px solid;
+  padding-bottom: 10px;
+  color: dodgerblue;
+`
+
 const PreStyled = styled.pre`
   background: hsl(0deg 0% 98%);
   border-left: 3px solid cornflowerblue;
@@ -31,6 +37,8 @@ const InlineCodeMDX = styled.code`
   border: 0;
   background: hsl(0deg 0% 98%);
   border-radius: 4px;
+  margin-inline: 2px;
+  font-weight: bold;
 `
 const AnchorMDX = styled.a`
   color: #527dc9;
@@ -63,7 +71,12 @@ const component = {
             {tokens.map((line, i) => (
               <div {...getLineProps({ line, key: i })}>
                 {line.map((token, key) => (
-                  <span {...getTokenProps({ token, key })} />
+                  // If the last line is empty, don't render anything
+                  i === tokens.length - 1 ?
+                    (token.content.trim().length
+                      ? <span {...getTokenProps({ token, key })} />
+                      : <></>)
+                    : <span {...getTokenProps({ token, key })} />
                 ))}
               </div>
             ))}
@@ -74,8 +87,7 @@ const component = {
   },
 };
 
-const PreMDX = (props: any) => <PreStyled {...props} />
-const CodeMDX = (props: any) => {console.log(props); return <CodeStyled {...props} />}
+const CodeMDX = (props: any) => { console.log(props); return <CodeStyled {...props} /> }
 
 const Layout: React.FC<PropsWithChildren> = ({ children }) => {
   return (
@@ -84,7 +96,8 @@ const Layout: React.FC<PropsWithChildren> = ({ children }) => {
         pre: component.pre,
         code: CodeMDX,
         inlineCode: InlineCodeMDX,
-        a: AnchorMDX
+        a: AnchorMDX,
+        h1: H1Styled
       }}
     >
       {children}
