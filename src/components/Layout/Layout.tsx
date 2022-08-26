@@ -87,7 +87,7 @@ const component = {
   },
 };
 
-const CodeMDX = (props: any) => { console.log(props); return <CodeStyled {...props} /> }
+const CodeMDX = (props: any) => <CodeStyled {...props} />
 
 const Layout: React.FC<PropsWithChildren> = ({ children }) => {
   return (
