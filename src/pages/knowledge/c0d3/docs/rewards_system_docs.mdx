@@ -10,22 +10,24 @@ import Layout from '../../../../components/Layout'
 <Layout>
 <MarkdownWrapper>
 
-# Student servers design doc
+# JS5 student servers design doc
+
+**Unfinished design doc**
 
 ## Goals
 
-- After a student complete JS4, a server should be created for them which they'll use to practice the content of JS5 in it.
+- After a student completes JS4, a server should be created for them which they'll use to practice the content of JS5 in it.
 
 ## Action items
 
 1. Get the student SSH key
 2. Create a server through [DigitalOcean API](https://github.com/pjpimentel/dots)
-3. Link the server IP to the student data in the db
+3. Link the server IP to the student data in the DB
 4. Display the reward and how it could be redeemed
 
 ### Get the student SSH key
 
-After the student complete JS4, The student will input their SSH key into a page under `/[username]/server`, this SSH will be used in the next action item to ensure that the student will have access to the server (and the admins).
+After the student completes JS4, The student will input their SSH key into a page under `/[username]/server`, this SSH will be used in the next action item to ensure that the student will have access to the server (and the admins).
 
 ### Create a server (droplet) through DigitalOcean API
 
@@ -146,10 +148,16 @@ E.g, What will happens if I stopped using the server?
 #### How to monitor student access to their servers
 
 1. The server will expire after the student finish JS5
-   - Remove the server once they finish JS5
+    - Remove the server once they finish JS5
 2. The server will exist as long as they use it
-   - "using it" means resources. They might have a server running which will use some of the resournnces. Monitoring their usage based on this metric won't work
-   - A better way is to monitor the most recent times they SSH-ed into the server. If the last time they accessed it is x days old, remove the server. To achieve this, we must create a custom image that'll have the system to monitor SSH access.
+    - "using it" means resources. They might have a server running that will use some of the resources. Monitoring their usage based on this metric won't work
+    - A better way is to monitor the most recent times they SSH-ed into the server. If the last time they accessed it is x days old, remove the server. To achieve this, we must create a custom image that'll have the SSH access monitoring system.
+  
+### References
+
+- [Issue for this design doc](#1938)
+- [DigitalOcean API](https://docs.digitalocean.com/reference/api/api-reference)
+- [DigitalOcean TS wrapper](https://github.com/pjpimentel/dots)
 
 </MarkdownWrapper>
 </Layout>
