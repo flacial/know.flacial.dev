@@ -1,5 +1,5 @@
 ---
-title: reward system design doc
+title: JS5 student free servers design doc
 path: /knowledge/c0d3/docs
 date: 2022-08-25
 ---
@@ -29,7 +29,7 @@ After the student complete J54, The student will input their SSH key into a page
 
 ### Create a server (droplet) through DigitalOcean API
 
-After getting the student SSH key, an action will auto be run that will send a POST request to the API endpoint `https://api.digitalocean.com/v2/droplets` with the following payload including the student SSH key:
+After getting the student SSH key, an action will auto be run that will send a POST request to the API endpoint `https://api.digitalocean.com/v2/droplets` to create a droplet with the following payload including the student SSH key:
 
 ```js
 {
@@ -50,16 +50,18 @@ After getting the student SSH key, an action will auto be run that will send a P
 ```ts
 try {
   const input = {
-    name: "example.com", // string
-    region: "nyc3", // string
-    size: "s-1vcpu-1gb", // string
-    image: "ubuntu-16-04-x64", // string
-    ssh_keys: ["Student_SSH_key", ...AdminSSHKeys]
-  };
-  const { data :{ droplet }} = await dots.droplet.createDroplet(input);
-  console.log(droplet);
+    name: 'example.com', // string
+    region: 'nyc3', // string
+    size: 's-1vcpu-1gb', // string
+    image: 'ubuntu-16-04-x64', // string
+    ssh_keys: ['Student_SSH_key', ...AdminSSHKeys],
+  }
+  const {
+    data: { droplet },
+  } = await dots.droplet.createDroplet(input)
+  console.log(droplet)
 } catch (error) {
-  console.log(error);
+  console.log(error)
 }
 ```
 
@@ -100,6 +102,7 @@ Example response:
 To get the Droplet IP and link it to the student, we could get it from the response's `droplet.networks.v4`. The `droplet.networks` is an object that has two properties: 1. v4 array of IPs 2. v6 array of IPs
 
 Example:
+
 ```
 "networks": {
   "v4": [
