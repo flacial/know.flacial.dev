@@ -1,0 +1,62 @@
+---
+title: EC2
+path: /knowledge/tech/aws
+date: 2023-01-02
+---
+
+import MarkdownWrapper from '../../../../components/MarkdownWrapper'
+import Layout from '../../../../components/Layout'
+
+<Layout>
+<MarkdownWrapper>
+
+# AWS — EC2
+
+EC2 helps engineers create a customizable server in which they can customize its OS, resources, and firewall.
+
+## Steps taken to create an EC2 instance
+
+The steps here are what I chose my instance will use, but they don't necessrily mean this is what your instance should also use.
+
+### Name and Tags
+
+Where you choose the Instance name or add additional tags. 
+
+The name I picked is `Flacial Links Server`
+
+### Application and OS Images
+
+I chose Ubuntu x86 because I'm familiar with it and it uses less resources compared to Windows.
+
+### Instance type
+
+In this section you choose the instance type or basically what CPU/Memory does the instance use.
+
+The instance varies from 2 vCPU/1 GiB Memory to 96 vCPU/764 GiB Memory.
+
+I picked t3.micro or 2 vCPU/1 GiB Memory because it's eligible to free tier.
+
+### Key pair
+
+Generate an SSH key that'll be used to securely connect to the instance. Once you pick the algorithm and key name, you'll download a file that has the credentials. 
+
+### Network settings
+
+Here you can configure the security group (who can communicate with the instance and who it can communicate with), SSH traffic (connecting to the instance), HTTPs, and HTTP.
+
+I choose to enable HTTPs and HTTP traffi, and only allow my IP to connect to the instance.
+
+### Configure storage
+
+Here we configure the storage the instance can have. We can choose up to 30 GB of storage in the free tier and this is what I picked.
+
+##### Additonal details
+
+Advanced stuff that I didn't touch.
+
+## Connecting to the instance
+
+After creating the instance, this window will show and follow the guide named "Connect to your instance"
+
+</MarkdownWrapper>
+</Layout>
