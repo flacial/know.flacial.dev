@@ -1,0 +1,144 @@
+---
+title: Stacks and Queues
+path: /knowledge/ds
+date: 2023-01-05
+---
+
+import MarkdownWrapper from '../../../components/MarkdownWrapper'
+import Layout from '../../../components/Layout'
+
+<Layout>
+<MarkdownWrapper>
+
+# Stacks & Queues
+
+Stacks and queues are linear data structures that allow us to access data sequentially. They are built on top of lower-level data structures such as arrays or linked lists, and they provide fewer methods than the data structures they are built upon.
+
+### Stacks
+
+Stacks follow the last-in-first-out (LIFO) principle, in which the last element added is the first one to be removed. They are useful when we only care about the value we last added, such as in the history of a web browser or the call stack of a programming language. Stacks can be implemented using either arrays or linked lists.
+
+```javascript
+class Node {
+  constructor(value){
+    this.value = value;
+    this.next = null;
+  }
+}
+
+class Stack {
+  constructor(){
+    this.top = null;
+    this.bottom = null;
+    this.length = 0;
+  }
+  peek() {
+    return this.top;
+  }
+  push(value){
+    this.length += 1
+    
+    if (!this.top) {
+      const top = new Node(value)
+      this.top = top
+      this.bottom = top
+      return this.top
+    }
+    
+    const oldTop = this.top
+    const newTop = new Node(value)
+    newTop.next = oldTop
+    
+    this.top = newTop
+
+    return this
+  }
+  pop(){
+    if (!this.top) return null
+    
+    if (this.length === 0 && this.bottom) {
+      this.bottom = null
+    }
+    
+    this.top = this.top.next
+    this.length -= 1
+    
+    return this
+  }
+  isEmpty(){
+    return !this.length
+  }
+}
+
+const myStack = new Stack();
+```
+
+
+
+### Queues
+
+They are the opposite of Stacks, we access FIFO, the first element in the queue gets accessed first.
+
+- Push is named Enqueue
+- Pop is named Dequeue
+- Peek shows the first element in the queue
+
+Queues follow the first-in-first-out (FIFO) principle, in which the first element added is the first one to be removed. They are implemented using linked lists because it is efficient to add and remove elements from the beginning of a linked list. Using arrays for queues can result in slower performance due to the overhead of re-indexing the array when elements are removed.
+
+```js
+class Node {
+  constructor(value) {
+    this.value = value;
+    this.next = null;
+  }
+}
+
+class Queue {
+  constructor(){
+    this.first = null;
+    this.last = null;
+    this.length = 0;
+  }
+  peek() {
+    return this.first;
+  }
+  enqueue(value){
+    const newNode = new Node(value);
+    if (this.length === 0) {
+      this.first = newNode;
+      this.last = newNode;
+    } else {
+      this.last.next = newNode;
+      this.last = newNode;
+    }
+    this.length++;
+    return this;
+  }
+  dequeue(){
+    if (!this.first) {
+      return null;
+    }
+    if (this.first === this.last) {
+      this.last = null;
+    }
+    const holdingPointer = this.first;
+    this.first = this.first.next;
+    this.length--;
+    return this;
+  }
+  //isEmpty;
+}
+```
+
+### Pros
+
+- Fast Operations — O(1)
+- Fast Peek
+- Ordered
+
+### Cons
+
+- Slow Lookup
+
+</MarkdownWrapper>
+</Layout>
