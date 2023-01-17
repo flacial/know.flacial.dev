@@ -1,0 +1,74 @@
+html,
+body {
+  background-color: #1c2127;
+}
+
+h2 {
+  font-size: 1.2em;
+}
+
+h2,
+h3 {
+  color: dodgerblue;
+}
+
+h4 {
+  color: #e4b567;
+  font-size: 1.25em;
+}
+
+h5,
+h6 {
+  font-size: 1.12em;
+  color: #e83f3e;
+  margin-bottom: 1em;
+}
+
+p,
+ul,
+ol {
+  color: #dadada;
+}
+
+blockquote {
+  padding: 0;
+  margin: 0;
+  border-left: 3px solid orange;
+  padding-left: 12px;
+  font-style: italic;
+}
+
+blockquote p {
+  color: #9a9a9a;
+}
+
+p:has(strong) {
+  margin: 0;
+  margin-bottom: 5px;
+}
+
+ul,
+ol {
+  padding-left: 25px;
+  display: flex;
+  flex-direction: column;
+  row-gap: 6px;
+}
+
+li::marker {
+  color: #7a8189;
+}
+
+strong {
+  color: #ff82b2;
+}
+
+.gatsby-resp-image-background-image {
+  margin-block: 20px 30px;
+}
+
+.gatsby-resp-image-image {
+  border-radius: 10px;
+  box-shadow: 6px 6px dodgerblue !important;
+  margin-block: 20px 30px;
+}
