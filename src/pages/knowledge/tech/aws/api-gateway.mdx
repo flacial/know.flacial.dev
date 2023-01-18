@@ -207,10 +207,10 @@ Below you'll find the exclusive features for each API type.
     - You can use this certificate to verify that incoming requests to your backend are from API Gateway, ensuring that only authorized requests are accepted. This improves the security of your backend system, even if it is publicly accessible.
   - AWS WAF(web exploits protection)
   - Edge-optimized
-    - Means that an API that is designed to have low latency and high availability. This is achieved by having the API endpoint located at the edge of the network, closer to the users that are accessing it.
+    - This means that an API that is designed to have low latency and high availability. This is achieved by having the API endpoint located at the edge of the network, closer to the users that are accessing it.
   - Private (second type of REST API)
     - A private endpoint in AWS refers to an endpoint that is only accessible within a virtual private cloud (VPC) or over an AWS Direct Connect link and not over the Internet. This means that the endpoint can only be accessed by resources within the same VPC or via a dedicated network connection, rather than over the public internet. This can be useful for situations where you want to keep certain resources or data private and only accessible by authorized users or systems.
-    - E.g, school campus or a bank
+    - E.g, a school campus or a bank
   - Request caching
   - [AWS X-Ray tracing](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-xray.html)
   - [Execution logs](https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-logging.html)
@@ -222,13 +222,13 @@ Below you'll find the exclusive features for each API type.
   - JWT
 - WebSocket API
 
-Major difference, an HTTP API only works with Lambda and HTTP backends (some Express.js API), while a REST API works with these too and other AWS services.
+The major difference, an HTTP API only works with Lambda and HTTP backends (some Express.js API), while a REST API works with these too, and other AWS services.
 
 Usually, an HTTP API is sufficient for Lambda function or HTTP backends as it costs less and provides lower latency.
 
 #### Creating an HTTP API for Pokedex with HTTP backend
 
-First we go to the AWS API Gateway panel, and select an HTTP API. The page `Create and configure integrations` will show up:
+First, we go to the AWS API Gateway panel and select an HTTP API. The page `Create and configure integrations` will show up:
 
 **Integrations**: Type of the integration whether it's a Lambda function or HTTP endpoint
 
@@ -238,7 +238,7 @@ First we go to the AWS API Gateway panel, and select an HTTP API. The page `Crea
 
 ![create and configure integrations](../../../../images/image-1.png)
 
-Next, Configure routes page. We choose what resource path and method that when are requests, will target https://pokeapi.co/api/v2/pokemon-form/pikachu
+Next, Configure the routes page. We choose what resource path and method that when are requests, will target https://pokeapi.co/api/v2/pokemon-form/pikachu
 
 We can set the resource path to anything, so I set it to `/pokedex` and the method is `GET` instead of `ANY` even though `ANY` would've worked.
 
@@ -246,11 +246,11 @@ We can set the resource path to anything, so I set it to `/pokedex` and the meth
 
 Next, Configure stages. We can use the default stage name here, and with auto-deploy on.
 
-> Stages are associated with a specific deployment of an API. A deployment is a snapshot of an API's configuration and resources at a given point in time. You can create multiple deployment stages, each with its own settings, and then use them to test different versions of your API before promoting them to production. They're like GitHub branches.
+> Stages are associated with a specific deployment of an API. A deployment is a snapshot of an API's configuration and resources at a given point in time. You can create multiple deployment stages, each with its settings, and then use them to test different versions of your API before promoting them to production. They're like GitHub branches.
 
 ![stages](../../../../images/image-3.png)
 
-Once this step is done, we create the API Gateway and we get this link https://7m3eb19o5m.execute-api.us-east-1.amazonaws.com/pokedex that once accessed, redirect our request to pokeAPI and returns the response from it.
+Once this step is done, we create the API Gateway and we get this link https://7m3eb19o5m.execute-api.us-east-1.amazonaws.com/pokedex that once accessed, redirects our request to pokeAPI and returns the response from it.
 
 #### Creating a REST API for Pokedex with a Lambda function
 
@@ -356,15 +356,133 @@ After we deploy it, we can now invoke the API from the provided Invoke URL that 
 
 For our example, it's https://mn9hd5qc51.execute-api.us-east-1.amazonaws.com/Prod/pokedex try to open this URL!
 
-### Advanced usage for AWS API Gateway
+#### Creating a REST API for an AWS Service (DynamoDB)
 
-_WIP..._
+AWS services do not typically provide an API for performing operations. However, you can use API Gateway to create an API endpoint that allows you to access an AWS service through an API call. This enables you to perform operations on the service using an API, rather than having to interact with the service directly.
+
+[Follow this guide to create a DynamoDB and the REST API resources and methods](https://aws.amazon.com/blogs/compute/using-amazon-api-gateway-as-a-proxy-for-dynamodb/) but generally, learn about what kind of Actions or APIs does the service has. In the case of DynamoDB, we'll use this [document](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.API.html).
+
+After following the steps mentioned in it, we'll have these two endpoints:
+
+1. [POST Endpoint](https://aqeebamk5e.execute-api.us-east-1.amazonaws.com/prod/item) for creating a new Pokemon
+2. [GET Endpoint](https://aqeebamk5e.execute-api.us-east-1.amazonaws.com/prod/item/{pokemon}) that takes a Pokemon's name path parameter
+   1. E.g, https://aqeebamk5e.execute-api.us-east-1.amazonaws.com/prod/item/pikachu
+
+For the `POST` Endpoint, if we send a request to create a Pokemon named `friesmeat` and has the age `3`, we'll send the following:
+
+```shell
+curl -X POST \
+  'https://aqeebamk5e.execute-api.us-east-1.amazonaws.com/prod/item' \
+  --header 'Accept: */*' \
+  --header 'User-Agent: Thunder Client (https://www.thunderclient.com)' \
+  --header 'Content-Type: application/json' \
+  --data-raw '{
+  "pokemonName": "friesmeat",
+  "age": "3"
+}'
+```
+
+And it responds with an empty object `{}` that indicates the operation was successful. [The action `PutItem` doesn't return the created object](https://docs.aws.amazon.com/amazondynamodb/latest/APIReference/API_PutItem.html#API_PutItem_ResponseSyntax) by spec.
+
+For the `GET` Endpoint, if we send a request to get the created Pokemon `friesmeat`:
+
+```shell
+curl -X GET \
+  'https://aqeebamk5e.execute-api.us-east-1.amazonaws.com/prod/item/friesmeat' \
+  --header 'Accept: */*' \
+  --header 'User-Agent: Thunder Client (https://www.thunderclient.com)'
+```
+
+It'll respond with the item:
+
+```json
+{
+  "pokemons": [
+    {
+      "itemId": "f8630ede-a6e4-4528-99aa-933b42f963ae",
+      "pokemonName": "friesmeat",
+      "age": "3"
+    }
+  ]
+}
+```
+
+##### Mapping templates
+
+A mapping template is a way to define how incoming data from an HTTP request should be transformed before it is passed to a backend service. This can include changing the format of the data, extracting specific values, or adding default values.
+
+```json
+{
+  "TableName": "Items", // default value
+  "Item": {
+    "itemId": {
+      "S": "$context.requestId"
+    },
+    "pokemonName": {
+      "S": "$input.path('$.pokemonName')"
+    },
+    "age": {
+      "S": "$input.path('$.age')"
+    }
+  }
+}
+```
+
+In the example given, the mapping template is used to ensure that requests sent to the DynamoDB integration have the correct format.
+
+The template sets the "TableName" to "Items" and defines the structure of the "Item" object, which includes "itemId", "pokemonName", and "age" attributes.
+
+Using this mapping template, the user is only required to provide the necessary information to create the "Item" object, rather than manually constructing the entire request body. It could also be used to map the Integration response to a format that's easier for the user to work with.
+
+```shell
+#set($inputRoot = $input.path('$'))
+{
+    "pokemons": [
+        #foreach($elem in $inputRoot.Items) {
+            "itemId": "$elem.itemId.S",
+            "pokemonName": "$elem.pokemonName.S",
+            "age": "$elem.age.S"
+        }#if($foreach.hasNext),#end
+	#end
+    ]
+}
+```
+
+This mapping template is used to define the format of the response that is sent back to the user when a request is made to DynamoDB integration.
+
+[Learn about the mapping template syntax through these examples](https://docs.aws.amazon.com/apigateway/latest/developerguide/rest-api-develop-models-mapping-examples.html)
+
+### Advanced API Gateway usage
+
+#### Logging
+
+In order to enable logging for an API in API Gateway, you need to create an IAM role that allows API Gateway to write logs to Amazon CloudWatch.
+
+You can follow this guide provided by AWS to integrate logging in API Gateway: [https://aws.amazon.com/premiumsupport/knowledge-center/api-gateway-cloudwatch-logs/](https://aws.amazon.com/premiumsupport/knowledge-center/api-gateway-cloudwatch-logs/)
+
+When sending a GET request, our logs will show details about the request, such as the request method, path, headers, and response status. An example of how the logs might look like:
+
+![logs](../../../../images/image-17.png)
+
+#### Authentication
+
+In an API, authentication can be implemented in two ways:
+
+1.  Using a Lambda function: You can create a Lambda function that handles the authentication process. This function would act as a middleware (C0D3) that verifies whether the user is authorized to execute the resolver or not.
+2.  Using a Cognito user pool: AWS Cognito User Pools provide an easy way to handle user sign-up, sign-in, and access control. _(Cognito totally went over my head)_
+
+#### Rate Limiting / Request Throttling
+
+API Gateway provides a feature called "Usage Plans" that allows you to specify rate limits and quotas for requests to an API. This feature can be used to control the number of requests per second, the total number of requests, and to track the usage of API keys.
+
+You can configure usage plans for an entire stage or for individual methods. To do this, go to the API Gateway console, select an API, then go to the "Usage Plans" section. There, you can specify the rate limits and quotas for the API, and create API keys for developers to use. This allows you to keep track of how much quota each developer is using, and to prevent excessive usage that might affect the performance of your API.
 
 ## Resources
 
 - AWS API Gateway
   - [Main docs](https://docs.aws.amazon.com/apigateway/latest/developerguide/welcome.html)
   - [REST API VS HTTP API](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-vs-rest.html)
+  - [Mapping templates & Models](https://docs.aws.amazon.com/apigateway/latest/developerguide/models-mappings.html#models-mappings-mappings)
 - [Express.js API Gateway](https://snyk.io/blog/how-to-build-secure-api-gateway-node-js/)
 - [Method response type](https://www.any-api.com/amazonaws_com/apigateway/docs/Definitions/MethodResponse)
 
