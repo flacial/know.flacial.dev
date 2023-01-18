@@ -61,7 +61,7 @@ const component = {
         {...defaultProps}
         theme={vsLight}
         code={props.children.props.children}
-        language={matches.groups?.lang ? matches.groups.lang : ''}
+        language={matches?.groups?.lang ? matches.groups.lang : ''}
       >
         {({ className, style, tokens, getLineProps, getTokenProps }) => (
           <PreStyled className={className} style={style}>
