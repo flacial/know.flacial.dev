@@ -6,6 +6,7 @@ date: 2023-01-15
 
 import MarkdownWrapper from '../../../../components/MarkdownWrapper'
 import Layout from '../../../../components/Layout'
+import AccordionComponent from '../../../../components/Accordion'
 
 <Layout>
 <MarkdownWrapper>
@@ -15,6 +16,12 @@ import Layout from '../../../../components/Layout'
 ## What's AWS API Gateway?
 
 Amazon Web Services (AWS) API Gateway is a fully managed service that makes it easy for developers to create, publish, maintain, monitor, and secure APIs at any scale. It acts as a "front door" for applications to access data, business logic, or functionality from your back-end services.
+
+<AccordionComponent summaryText="View Diagram">
+
+![design of API Gateway request](../../../../images/image-19.png)
+
+</AccordionComponent>
 
 ## AWS API Gateway vs Express.js API Gateway
 
@@ -135,6 +142,8 @@ app.use(limiter)
 // ...
 ```
 
+<AccordionComponent iconColor="warning" summaryColor="#ed6c02" summaryText="Inaccurate: scaling">
+
 #### Scaling
 
 With an express.js app, you would have to manually scale your API by spinning up additional servers and managing load balancers, whereas with AWS API Gateway, you can easily scale your API by adjusting the number of API Gateway instances.
@@ -183,6 +192,8 @@ if (cluster.isMaster) {
 }
 ```
 
+</AccordionComponent>
+
 ### AWS API Gateway
 
 ##### Other features
@@ -196,31 +207,37 @@ if (cluster.isMaster) {
 
 #### REST APIs vs HTTP APIs
 
-Below you'll find the exclusive features for each API type.
+<AccordionComponent summaryText="Exclusive features for each API type">
 
-- REST API
-  - API keys
-  - Per-client rate-limiting
-  - Per-client usage throttling
-  - Resource policies (who can invoke the API)
-  - Certificates for backend auth
-    - You can use this certificate to verify that incoming requests to your backend are from API Gateway, ensuring that only authorized requests are accepted. This improves the security of your backend system, even if it is publicly accessible.
-  - AWS WAF(web exploits protection)
-  - Edge-optimized
-    - This means that an API that is designed to have low latency and high availability. This is achieved by having the API endpoint located at the edge of the network, closer to the users that are accessing it.
-  - Private (second type of REST API)
-    - A private endpoint in AWS refers to an endpoint that is only accessible within a virtual private cloud (VPC) or over an AWS Direct Connect link and not over the Internet. This means that the endpoint can only be accessed by resources within the same VPC or via a dedicated network connection, rather than over the public internet. This can be useful for situations where you want to keep certain resources or data private and only accessible by authorized users or systems.
-    - E.g, a school campus or a bank
-  - Request caching
-  - [AWS X-Ray tracing](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-xray.html)
-  - [Execution logs](https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-logging.html)
-  - [Access logs to Amazon Kinesis Data Firehose](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-logging-to-kinesis.html)
-  - [Private integrations with Application Load Balancers](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-private.html)
-  - [Private integrations with AWS Cloud Map](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-private.html)
-- HTTP API
-  - Automatic deployments
-  - JWT
-- WebSocket API
+- REST API - API keys - Per-client rate-limiting - Per-client usage throttling
+- Resource policies (who can invoke the API) - Certificates for backend auth -
+  You can use this certificate to verify that incoming requests to your backend
+  are from API Gateway, ensuring that only authorized requests are accepted.
+  This improves the security of your backend system, even if it is publicly
+  accessible. - AWS WAF(web exploits protection) - Edge-optimized - This means
+  that an API that is designed to have low latency and high availability. This
+  is achieved by having the API endpoint located at the edge of the network,
+  closer to the users that are accessing it. - Private (second type of REST API)
+- A private endpoint in AWS refers to an endpoint that is only accessible
+  within a virtual private cloud (VPC) or over an AWS Direct Connect link and
+  not over the Internet. This means that the endpoint can only be accessed by
+  resources within the same VPC or via a dedicated network connection, rather
+  than over the public internet. This can be useful for situations where you
+  want to keep certain resources or data private and only accessible by
+  authorized users or systems. - E.g, a school campus or a bank - Request
+  caching - [AWS X-Ray
+  tracing](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-xray.html)
+- [Execution
+  logs](https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-logging.html)
+- [Access logs to Amazon Kinesis Data
+  Firehose](https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-logging-to-kinesis.html)
+- [Private integrations with Application Load
+  Balancers](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-private.html)
+- [Private integrations with AWS Cloud
+  Map](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-private.html)
+- HTTP API - Automatic deployments - JWT - WebSocket API
+
+</AccordionComponent>
 
 The major difference, an HTTP API only works with Lambda and HTTP backends (some Express.js API), while a REST API works with these too, and other AWS services.
 
