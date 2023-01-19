@@ -1,7 +1,7 @@
-import React from "react"
-import { graphql, Link, useStaticQuery } from "gatsby";
-import styled from "styled-components";
-import MarkdownWrapper from "../components/MarkdownWrapper";
+import React from 'react'
+import { graphql, Link, useStaticQuery } from 'gatsby'
+import styled from 'styled-components'
+import MarkdownWrapper from '../components/MarkdownWrapper'
 
 const HeadingStyled = styled.h1`
   border-bottom: 3px solid;
@@ -50,20 +50,22 @@ type MDXpage = {
 }
 
 const IndexPage = () => {
-  const { allMdx: { nodes } } = useStaticQuery(ALL_MDX)
+  const {
+    allMdx: { nodes },
+  } = useStaticQuery(ALL_MDX)
 
   const mapPagesToElements = nodes.map((page: MDXpage) => {
-    return <Link to={page.slug}>
-      <AnchorMDX>{page.frontmatter.title}</AnchorMDX>
-    </Link>
+    return (
+      <Link to={page.slug}>
+        <AnchorMDX>{page.frontmatter.title}</AnchorMDX>
+      </Link>
+    )
   })
 
   return (
     <MarkdownWrapper>
       <HeadingStyled>Available pages</HeadingStyled>
-      <ListStyled>
-        {mapPagesToElements}
-      </ListStyled>
+      <ListStyled>{mapPagesToElements}</ListStyled>
     </MarkdownWrapper>
   )
 }
