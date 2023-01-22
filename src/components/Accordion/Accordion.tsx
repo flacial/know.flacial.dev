@@ -7,7 +7,6 @@ import React from 'react'
 import { IconProps } from '@mui/material'
 
 type Props = {
-  content: string
   iconColor?: IconProps['color']
   summaryColor?: string
   summaryText: string
