@@ -1,0 +1,341 @@
+---
+title: AWS CDK and CloudFormation
+path: /knowledge/tech/aws
+date: 2023-01-22
+---
+
+import MarkdownWrapper from '../../../../components/MarkdownWrapper'
+import Layout from '../../../../components/Layout'
+import Accordion from '../../../../components/Accordion'
+
+<Layout>
+<MarkdownWrapper>
+
+# AWS — CDK and CloudFormation
+
+## Defining AWS infra with CDK and deploying it
+
+> Stack: collection of AWS services (constructs)
+
+> Construct: AWS service
+
+**Goal:** create an API gateway with a resource named `pikachu` and an HTTP backend integration that returns Pikachu data from PokeAPI.
+
+We'll define a _Stack_ that contains an API gateway _Construct_ and deploy it to our AWS account. The API Gateway will have a route with an HTTP backend integration that once hit, will send back Pikachu data from PokeAPI.
+
+```ts
+import { CorsHttpMethod, HttpMethod } from '@aws-cdk/aws-apigatewayv2-alpha'
+import { Stack, StackProps, CfnOutput } from 'aws-cdk-lib'
+import { HttpUrlIntegration } from '@aws-cdk/aws-apigatewayv2-integrations-alpha'
+import { Construct } from 'constructs'
+import * as apigwv2 from '@aws-cdk/aws-apigatewayv2-alpha'
+
+export class CdkStack extends Stack {
+  // All the stacks have the same props
+  // It's possible to have multiple stacks
+  // A stack can have multiple constructs
+  // https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html#getting_started_concepts
+  constructor(scope: Construct, id: string, props?: StackProps) {
+    super(scope, id, props)
+
+    // HTTP backend integration
+    const getPokemonIntegration = new HttpUrlIntegration(
+      'GetPokemonIntegration',
+      'https://pokeapi.co/api/v2/pokemon-form/pikachu'
+    )
+
+    // Construct new HTTP API
+    const httpApi = new apigwv2.HttpApi(this, 'pikachu-api', {
+      description: 'Pikachu API',
+      corsPreflight: {
+        allowHeaders: [
+          'Content-Type',
+          'X-Amz-Date',
+          'Authorization',
+          'X-Api-Key',
+        ],
+        allowMethods: [
+          CorsHttpMethod.OPTIONS,
+          CorsHttpMethod.GET,
+          CorsHttpMethod.POST,
+          CorsHttpMethod.PUT,
+          CorsHttpMethod.PATCH,
+          CorsHttpMethod.DELETE,
+        ],
+        allowCredentials: true,
+        allowOrigins: ['http://localhost:3000'],
+      },
+    })
+
+    // Add route/resource and its integration to HTTP API
+    httpApi.addRoutes({
+      path: '/pikachu',
+      methods: [HttpMethod.GET],
+      integration: getPokemonIntegration,
+    })
+
+    // Add stage to HTTP API
+    new apigwv2.HttpStage(this, 'Stage', {
+      httpApi,
+      stageName: 'prod',
+    })
+
+    // Once it gets deployed, output the API URL
+    new CfnOutput(this, 'apiUrl', {
+      value: httpApi.url!,
+    })
+  }
+}
+```
+
+Deploying it can be done with a single command `npx cdk deploy`. If we went to our AWS account, we should find the new API gateway.
+
+## Turn our stack into a CloudFormation template
+
+We simply run the command `npx cdk synth` and it prints the CloudFormation template for the stack. In our case, it'll print:
+
+<Accordion summaryText="CloudFormation template">
+
+```yaml
+Resources:
+  pikachuapiAE61503F:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      CorsConfiguration:
+        AllowCredentials: true
+        AllowHeaders:
+          - Content-Type
+          - X-Amz-Date
+          - Authorization
+          - X-Api-Key
+        AllowMethods:
+          - OPTIONS
+          - GET
+          - POST
+          - PUT
+          - PATCH
+          - DELETE
+        AllowOrigins:
+          - http://localhost:3000
+      Description: Pikachu API
+      Name: pikachu-api
+      ProtocolType: HTTP
+    Metadata:
+      aws:cdk:path: CdkStack/pikachu-api/Resource
+  pikachuapiDefaultStageB24BF708:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      ApiId:
+        Ref: pikachuapiAE61503F
+      StageName: $default
+      AutoDeploy: true
+    Metadata:
+      aws:cdk:path: CdkStack/pikachu-api/DefaultStage/Resource
+  pikachuapiGETpikachuGetPokemonIntegrationF4A0D085:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId:
+        Ref: pikachuapiAE61503F
+      IntegrationType: HTTP_PROXY
+      IntegrationMethod: ANY
+      IntegrationUri: https://pokeapi.co/api/v2/pokemon-form/pikachu
+      PayloadFormatVersion: '1.0'
+    Metadata:
+      aws:cdk:path: CdkStack/pikachu-api/GET--pikachu/GetPokemonIntegration/Resource
+  pikachuapiGETpikachu4262A8E7:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId:
+        Ref: pikachuapiAE61503F
+      RouteKey: GET /pikachu
+      AuthorizationType: NONE
+      Target:
+        Fn::Join:
+          - ''
+          - - integrations/
+            - Ref: pikachuapiGETpikachuGetPokemonIntegrationF4A0D085
+    Metadata:
+      aws:cdk:path: CdkStack/pikachu-api/GET--pikachu/Resource
+  Stage0E8C2AF5:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      ApiId:
+        Ref: pikachuapiAE61503F
+      StageName: prod
+    Metadata:
+      aws:cdk:path: CdkStack/Stage/Resource
+  CDKMetadata:
+    Type: AWS::CDK::Metadata
+    Properties:
+      Analytics: v2:deflate64:H4sIAAAAAAAA/02OQQ6CMBBFz+K+LZSFcalhoysTPICpUHEA24ZOIYb07raFBav3Z/Izbwp25GzhBzFbWjc9HeDFlgeKuidh9RQGWoFyFr+pYEv5VhcDJCA0WhnDTaFsR4GgVRwr7VD6mO4OjcO0k1a7sU71UqsGYtkTTsVgPoLlh/MmzyL3xq2xXBFNFEeu5piSK6XdE94TpRvJOptN/MTycL6zAHR0CuErWbXyD0hjvU33AAAA
+    Metadata:
+      aws:cdk:path: CdkStack/CDKMetadata/Default
+    Condition: CDKMetadataAvailable
+Outputs:
+  apiUrl:
+    Value:
+      Fn::Join:
+        - ''
+        - - https://
+          - Ref: pikachuapiAE61503F
+          - .execute-api.
+          - Ref: AWS::Region
+          - '.'
+          - Ref: AWS::URLSuffix
+          - /
+Conditions:
+  CDKMetadataAvailable:
+    Fn::Or:
+      - Fn::Or:
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - af-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-east-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-northeast-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-northeast-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-southeast-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-southeast-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ca-central-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - cn-north-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - cn-northwest-1
+      - Fn::Or:
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-central-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-north-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-west-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-west-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-west-3
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - me-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - sa-east-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-east-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-east-2
+      - Fn::Or:
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-west-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-west-2
+Parameters:
+  BootstrapVersion:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /cdk-bootstrap/hnb659fds/version
+    Description: Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]
+Rules:
+  CheckBootstrapVersion:
+    Assertions:
+      - Assert:
+          Fn::Not:
+            - Fn::Contains:
+                - - '1'
+                  - '2'
+                  - '3'
+                  - '4'
+                  - '5'
+                - Ref: BootstrapVersion
+        AssertDescription: CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI.
+```
+
+</Accordion>
+
+## Why AWS CDK
+
+CloudFormation has been around more than CDK and it has more features and a larger user base. But, I think for those who often code, provisioning and managing our infra on AWS with code is easier than JSON or YAML.
+
+AWS CDK is for those who prefer using a code-based approach to define the infra, while AWS CloudFormation is for those who prefer using JSON or YAML or prefer to just continue using CloudFormation as they've been using it for a while.
+
+## More examples
+
+### Lambda Function
+
+`cdk-stack.ts`
+
+```ts
+import * as cdk from 'aws-cdk-lib'
+import { NodejsFunction } from 'aws-cdk-lib/aws-lambda-nodejs'
+import * as lambda from 'aws-cdk-lib/aws-lambda'
+import * as path from 'path'
+
+export class CdkStack extends cdk.Stack {
+  constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
+    super(scope, id, props)
+
+    new NodejsFunction(this, 'helloFn', {
+      memorySize: 1024,
+      timeout: cdk.Duration.seconds(5),
+      runtime: lambda.Runtime.NODEJS_18_X,
+      handler: 'main',
+      entry: path.join(__dirname, `../functions/hello.ts`),
+    })
+  }
+}
+```
+
+`hello.ts`
+
+```ts
+import { APIGatewayProxyEventV2, APIGatewayProxyResultV2 } from 'aws-lambda'
+
+export async function main(
+  event: APIGatewayProxyEventV2
+): Promise<APIGatewayProxyResultV2> {
+  return {
+    body: JSON.stringify({ message: 'Hello World 👋🏼' }),
+    statusCode: 200,
+  }
+}
+```
+
+### Complex stack
+
+[Stack with API Gateway, Lambda Function, and DynamoDB](https://github.com/aws-samples/aws-cdk-examples/blob/master/typescript/api-cors-lambda-crud-dynamodb/index.ts)
+
+### Resources
+
+- [AWS CDK — Getting Started](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html#getting_started_concepts)
+- [CloudFormation vs CDK](https://www.tinystacks.com/blog-post/aws-cdk-vs-cloudformation/)
+- [API Gateway example](https://bobbyhadz.com/blog/aws-cdk-http-api-apigateway-v2-example)
+- [Lambda Function Example](https://bobbyhadz.com/blog/aws-cdk-typescript-lambda)
+- [TypeScript examples](https://github.com/aws-samples/aws-cdk-examples/tree/master/typescript)
+
+</MarkdownWrapper>
+</Layout>
