@@ -7,7 +7,7 @@ date: 2022-08-01
 import MarkdownWrapper from '../../components/MarkdownWrapper'
 import Layout from '../../components/Layout'
 
-<Layout>
+<Layout title={props.pageContext.frontmatter.title}>
 <MarkdownWrapper>
 
 # Guides
@@ -18,7 +18,7 @@ import Layout from '../../components/Layout'
 
 #### Problem
 
-Let's say we have a function that takes a callback function and call it. 
+Let's say we have a function that takes a callback function and call it.
 
 Here's our function:
 
@@ -50,7 +50,9 @@ Our function `mainFn` can handle these easily, but an issue arose. We're using T
 Easiest solution is to hardcode the types:
 
 ```ts
-const mainFn = (cb: (() => number) | (() => string) | (() => number[])): number | string | number[] => cb()
+const mainFn = (
+  cb: (() => number) | (() => string) | (() => number[])
+): number | string | number[] => cb()
 ```
 
 Now let's say `mainFn` will be called 100 times, with 100 different function functions, and each function has a different return type. Hardcoding a 100 type is overkill.
@@ -75,12 +77,12 @@ Compared with parameters:
 (num1, num2) => num1 + num2
 
 // Generics syntax
-// Wraps its placeholders with angle brackets 
+// Wraps its placeholders with angle brackets
 // and comes before the parameters
 <T1, T2>(num1: T1, num2: T2) => num1 + num2
 ```
 
-Back to our *main* issue, we can solve it by passing the type everytime we call `mainFn`:
+Back to our _main_ issue, we can solve it by passing the type everytime we call `mainFn`:
 
 ```ts
 // One that returns a number
@@ -95,7 +97,7 @@ mainFn<string>(
   () => 'string'
 )
 
-// Another than returns an array 
+// Another than returns an array
 // We define the return type as number[] through generics
 mainFn<number[]>(
   () => [...] // Array that contain numbers

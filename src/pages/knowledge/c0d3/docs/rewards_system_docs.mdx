@@ -7,7 +7,7 @@ date: 2022-08-25
 import MarkdownWrapper from '../../../../components/MarkdownWrapper'
 import Layout from '../../../../components/Layout'
 
-<Layout>
+<Layout title={props.pageContext.frontmatter.title}>
 <MarkdownWrapper>
 
 # JS5 student servers design doc
@@ -148,11 +148,11 @@ E.g, What will happens if I stopped using the server?
 #### How to monitor student access to their servers
 
 1. The server will expire after the student finish JS5
-    - Remove the server once they finish JS5
+   - Remove the server once they finish JS5
 2. The server will exist as long as they use it
-    - "using it" means resources. They might have a server running that will use some of the resources. Monitoring their usage based on this metric won't work
-    - A better way is to monitor the most recent times they SSH-ed into the server. If the last time they accessed it is x days old, remove the server. To achieve this, we must create a custom image that'll have the SSH access monitoring system.
-  
+   - "using it" means resources. They might have a server running that will use some of the resources. Monitoring their usage based on this metric won't work
+   - A better way is to monitor the most recent times they SSH-ed into the server. If the last time they accessed it is x days old, remove the server. To achieve this, we must create a custom image that'll have the SSH access monitoring system.
+
 ### References
 
 - [Issue for this design doc](#1938)

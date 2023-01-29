@@ -7,7 +7,7 @@ date: 2022-08-08
 import MarkdownWrapper from '../../../../components/MarkdownWrapper'
 import Layout from '../../../../components/Layout'
 
-<Layout>
+<Layout title={props.pageContext.frontmatter.title}>
 <MarkdownWrapper>
 
 # Creating the add-exercise page
@@ -17,7 +17,6 @@ import Layout from '../../../../components/Layout'
 Create a mini design doc that goes through the things that need to be made or thought of before creating the page.
 
 [The mini design doc for this page](../docs/add_exercise_docs)
-
 
 #### Data
 
@@ -37,11 +36,11 @@ export const lessons = () => {
   return prisma.lesson.findMany({
     include: {
       challenges: { orderBy: { order: 'asc' } },
-      modules: { orderBy: { order: 'asc' } }
+      modules: { orderBy: { order: 'asc' } },
     },
     orderBy: {
-      order: 'asc'
-    }
+      order: 'asc',
+    },
   })
 }
 ```
@@ -92,10 +91,11 @@ export default ADD_EXERCISE
 The `Dropdown` menu will be used to switch between the modules. The selected module will be stored in the parent state as we'll later need it when executing the `createExercise` mutation.
 
 We need to consider the following cases before coding it:
+
 - Should we display the lesson's first module or make the user set the module they want to add an exercise to?
-    - Make the user set the module because there's a chance the user might create an exercise for the default by accident.
+  - Make the user set the module because there's a chance the user might create an exercise for the default by accident.
 - What happens if the user didn't select a module?
-    - Show them an error that explains how they need to select a module to add an exercise to it.
+  - Show them an error that explains how they need to select a module to add an exercise to it.
 
 We found out we already have a `DropdownMenu` component in our components library. Instead of creating a new one, we chose to refactor and restyle it.
 
@@ -140,7 +140,7 @@ export const DropdownMenu: React.FC<DropDownMenuProps> = ({
   title,
   size,
   items,
-  bsPrefix
+  bsPrefix,
 }) => {
   const menuItems = items.map((item: Item, itemsIndex: number) =>
     !item ? (
@@ -214,10 +214,10 @@ const ChevronRight = () => <ChevronRightIcon size={17} />
 export const DropdownMenu: React.FC<DropDownMenuProps> = ({
   items,
   title,
-  customTitle
+  customTitle,
 }) => {
   const [activeItem, setActiveItem] = useState({
-    name: title || customTitle
+    name: title || customTitle,
   })
 
   return (
@@ -235,7 +235,7 @@ export const DropdownMenu: React.FC<DropDownMenuProps> = ({
               item?.onClick && item.onClick(item)
 
               setActiveItem({
-                name: item?.name
+                name: item?.name,
               })
             }}
           >
@@ -249,10 +249,10 @@ export const DropdownMenu: React.FC<DropDownMenuProps> = ({
 ```
 
 Main differences:
+
 - Remove most of the component props as they're not used in any other reference of the component
 - Add a `customTitle` to pass in a custom title (this is the exact same as `title`)
 - Refactor the component so it sets the selected item as the active one by calling `item.onClick` callback function
-
 
 ##### Inputs
 
@@ -260,41 +260,40 @@ For the inputs, we chose to use the `FormCard` component from the components lib
 
 It all went fine except the part of not creating an execrise when one of the inputs is invalid.
 
-`FormCard` has a submit button that we could pass to it our logic when it's clicked. This function executes what you pass without validating the inputs first. 
+`FormCard` has a submit button that we could pass to it our logic when it's clicked. This function executes what you pass without validating the inputs first.
 
 One solution we used is to run the `formChange` helper for each input before adding the exercise. This method will validate each input and set its error message if it's invalid.
 
 ```ts
-  const handleChange = async (value: string, propertyIndex: number) => {
-    await formChange(
-      value, // Input value
-      propertyIndex, // Input index
-      formOptions, // All inputs object
-      setFormOptions, // SetState action to update the inputs
-      exercisesValidation // Validation schema
-    )
-  }
-  
-  const onClick = () => {
-    try {
-      /*
+const handleChange = async (value: string, propertyIndex: number) => {
+  await formChange(
+    value, // Input value
+    propertyIndex, // Input index
+    formOptions, // All inputs object
+    setFormOptions, // SetState action to update the inputs
+    exercisesValidation // Validation schema
+  )
+}
+
+const onClick = () => {
+  try {
+    /*
       With how handleChange work, it'll run the exercisesValidation with each input and display its error message if it's invalid
       */
-      formOptions.forEach((form, index) => {
-        handleChange(form.value, index)
-      })
+    formOptions.forEach((form, index) => {
+      handleChange(form.value, index)
+    })
 
-      // ....
+    // ....
 
-      // ...
-      
-      // ...
-    } catch (err) {
-      // ...
-    }
+    // ...
+
+    // ...
+  } catch (err) {
+    // ...
   }
+}
 ```
-
 
 ##### Creating an exercise (submit)
 
@@ -305,22 +304,22 @@ The solution to show the error message for each input if it's invalid doesn't pr
 To solve it, we created a check that goes through each input and validate if it's not empty. If all of them are not empty, submit, else show an error.
 
 ```ts
-  const onClick = () => {
-    try {
-      // ...
+const onClick = () => {
+  try {
+    // ...
 
-      const validateInputs = formOptions.every(form => form.value)
+    const validateInputs = formOptions.every((form) => form.value)
 
-      // ...
-      
-      // If all the inputs are not empty, add an exercise
-      if (validateInputs) {
-        return addExercise()
-      }
-    } catch (err) {
-      // ...
+    // ...
+
+    // If all the inputs are not empty, add an exercise
+    if (validateInputs) {
+      return addExercise()
     }
+  } catch (err) {
+    // ...
   }
+}
 ```
 
 </MarkdownWrapper>

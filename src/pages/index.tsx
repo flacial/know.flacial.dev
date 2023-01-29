@@ -2,6 +2,7 @@ import React from 'react'
 import { graphql, Link, useStaticQuery } from 'gatsby'
 import styled from 'styled-components'
 import MarkdownWrapper from '../components/MarkdownWrapper'
+import { GlobalHead } from '../utils/GlobalHead'
 
 const HeadingStyled = styled.h1`
   border-bottom: 3px solid;
@@ -63,10 +64,14 @@ const IndexPage = () => {
   })
 
   return (
-    <MarkdownWrapper>
-      <HeadingStyled>Available pages</HeadingStyled>
-      <ListStyled>{mapPagesToElements}</ListStyled>
-    </MarkdownWrapper>
+    <>
+      <GlobalHead title="Knowledge Home">
+        <MarkdownWrapper>
+          <HeadingStyled>Available pages</HeadingStyled>
+          <ListStyled>{mapPagesToElements}</ListStyled>
+        </MarkdownWrapper>
+      </GlobalHead>
+    </>
   )
 }
 

@@ -1,5 +1,5 @@
 ---
-title: EC2
+title: AWS EC2
 path: /knowledge/tech/aws
 date: 2023-01-02
 ---
@@ -7,7 +7,7 @@ date: 2023-01-02
 import MarkdownWrapper from '../../../../components/MarkdownWrapper'
 import Layout from '../../../../components/Layout'
 
-<Layout>
+<Layout title={props.pageContext.frontmatter.title}>
 <MarkdownWrapper>
 
 # AWS — EC2
@@ -20,7 +20,7 @@ The steps here are what I chose my instance will use, but they don't necessarily
 
 ### Name and Tags
 
-Where you choose the Instance name or add additional tags. 
+Where you choose the Instance name or add additional tags.
 
 The name I picked is `Flacial Links Server`
 
@@ -38,7 +38,7 @@ I picked t3.micro or 2 vCPU/1 GiB Memory because it's eligible to free tier.
 
 ### Key pair
 
-Generate an SSH key that'll be used to securely connect to the instance. Once you pick the algorithm and key name, you'll download a file that has the credentials. 
+Generate an SSH key that'll be used to securely connect to the instance. Once you pick the algorithm and key name, you'll download a file that has the credentials.
 
 ### Network settings
 

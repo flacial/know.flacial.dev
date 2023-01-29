@@ -51,6 +51,8 @@ const AnchorMDX = styled.a`
 `
 
 import Highlight, { defaultProps } from 'prism-react-renderer'
+import { graphql } from 'gatsby'
+import { GlobalHead } from '../../utils/GlobalHead'
 
 const component = {
   pre: (props: ReactElement['props']) => {
@@ -94,19 +96,26 @@ const CustomAnchorMDX = (props: ReactElement['props']) => (
   <AnchorMDX {...props} target="_blank" />
 )
 
-const Layout: React.FC<PropsWithChildren> = ({ children }) => {
+const Layout: React.FC<PropsWithChildren<{ title: string }>> = ({
+  children,
+  title,
+}) => {
   return (
-    <MDXProvider
-      components={{
-        pre: component.pre,
-        code: CodeMDX,
-        inlineCode: InlineCodeMDX,
-        a: CustomAnchorMDX,
-        h1: H1Styled,
-      }}
-    >
-      {children}
-    </MDXProvider>
+    <>
+      <GlobalHead title={title}>
+        <MDXProvider
+          components={{
+            pre: component.pre,
+            code: CodeMDX,
+            inlineCode: InlineCodeMDX,
+            a: CustomAnchorMDX,
+            h1: H1Styled,
+          }}
+        >
+          {children}
+        </MDXProvider>
+      </GlobalHead>
+    </>
   )
 }
 

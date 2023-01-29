@@ -7,7 +7,7 @@ date: 2022-08-08
 import MarkdownWrapper from '../../../../components/MarkdownWrapper'
 import Layout from '../../../../components/Layout'
 
-<Layout>
+<Layout title={props.pageContext.frontmatter.title}>
 <MarkdownWrapper>
 
 # Exercise page design (#1975)
@@ -56,12 +56,11 @@ const DropDownMenu = (filteredModules, activeModule, setActiveModule) => {
 **Questions**:
 
 - ~~What happens if the `moduleId` in the URL is invalid?~~
-- What if there are 100 modules? 
-    - How to list them?
-        - Add an input where they can see a list of modules and search for one.
+- What if there are 100 modules?
+  - How to list them?
+    - Add an input where they can see a list of modules and search for one.
 - ~~What if the module got renamed while another eng is trying to add an exercise to it?~~
-    - We use the `moduleId` to find the right module to add an exercise to.
-
+  - We use the `moduleId` to find the right module to add an exercise to.
 
 ### Exaplantion & Question inputs
 
@@ -69,7 +68,6 @@ const DropDownMenu = (filteredModules, activeModule, setActiveModule) => {
 ![](media/16595322784961/16595363160396.jpg)
 
 Use [mdInput](https://github.com/garageScript/c0d3-app/blob/f50e1dbd245678b078d55cbef5d130ec0f4fd9be/components/MdInput.tsx). There will be a state that will be updated with the value the input has.
-
 
 ### Answer radio inputs
 
@@ -84,8 +82,8 @@ Regular input
 **Questions:**
 
 - ~~How to figure out if no answer was chosen as the correct answer?~~
-    - Where should the error message appear?
-        - Above the inputs
+  - Where should the error message appear?
+    - Above the inputs
 
 ### Submit button
 
