@@ -63,13 +63,13 @@ Select the Quick deployment strategy and proceed to deploy.
 
 ### Getting the configurations in the client
 
-[Link for the client or web app](), **Let me know when you open it, so I can switch the feature on.**
+[Link for the client or web app](https://aws-appconfig.vercel.app/) (_the feature flag is on_), **Let me know when you open it, so I can switch the feature off.**
 
 We'll use [`@aws-sdk/client-appconfigdata`](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-appconfigdata/index.html#description) to retrieve the configurations. Here's an example with Next.js.
 
 #### Steps
 
-1. Initiate the AppConfig client with each layer ID
+1. Initiate the AppConfig client with each layer ID and IAM user access token
 2. Send a [StartConfigurationSession command](https://docs.aws.amazon.com/appconfig/2019-10-09/APIReference/API_appconfigdata_StartConfigurationSession.html) to get the initial configuration token
 3. Send a [GetLatestConfiguration command](https://docs.aws.amazon.com/appconfig/2019-10-09/APIReference/API_appconfigdata_GetLatestConfiguration.html) to get the latest configurations
 4. Convert the `Configuration` from Uint8Array to JSON
@@ -99,37 +99,48 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
-  // Initiate AppConfig Client
-  const client = new AppConfigDataClient({ region: 'us-east-1' })
+  try {
+    // Initiate AppConfig Client
+    const client = new AppConfigDataClient({
+      region: 'us-east-1',
+      // IAM user access token
+      credentials: {
+        accessKeyId: process.env.ACCESS_KEY!,
+        secretAccessKey: process.env.ACCESS_SECRET!,
+      },
+    })
 
-  // Find these by going to each layer's details
-  const params = {
-    ApplicationIdentifier: process.env.APPLICATION_IDENTIFIER,
-    ConfigurationProfileIdentifier:
-      process.env.CONFIGURATION_PROFILE_IDENTIFIER,
-    EnvironmentIdentifier: process.env.ENVIRONMENT_IDENTIFIER,
+    const params = {
+      ApplicationIdentifier: process.env.APPLICATION_IDENTIFIER,
+      ConfigurationProfileIdentifier:
+        process.env.CONFIGURATION_PROFILE_IDENTIFIER,
+      EnvironmentIdentifier: process.env.ENVIRONMENT_IDENTIFIER,
+    }
+
+    // Command used to get the initial configuration token
+    const command = new StartConfigurationSessionCommand(params)
+
+    // Store the token
+    token = (await client.send(command)).InitialConfigurationToken
+
+    // Command to get the latest configuration. It takes the initial token
+    // and responds with a new token
+    const getConfigsCommand = new GetLatestConfigurationCommand({
+      ConfigurationToken: token,
+    })
+
+    const configsRes = await client.send(getConfigsCommand)
+
+    // Convert Uint8Array to JSON
+    const configs = JSON.parse(
+      Buffer.from(configsRes.Configuration || []).toString('utf-8')
+    )
+
+    res.status(200).json({ config: configs })
+  } catch (e) {
+    // @ts-ignore
+    res.status(500).send({ error: e })
   }
-
-  // Command used to get the initial configuration token
-  const command = new StartConfigurationSessionCommand(params)
-
-  // Store the token
-  token = (await client.send(command)).InitialConfigurationToken
-
-  // Command to get the latest configuration. It takes the initial token
-  // and responds with a new token
-  const getConfigsCommand = new GetLatestConfigurationCommand({
-    ConfigurationToken: token,
-  })
-
-  const configsRes = await client.send(getConfigsCommand)
-
-  // Convert Uint8Array to JSON
-  const configs = JSON.parse(
-    Buffer.from(configsRes.Configuration || []).toString('utf-8')
-  )
-
-  res.status(200).json({ config: configs })
 }
 ```
 
@@ -258,7 +269,7 @@ Example if the growth factor is 4:
 
 ### Bake time
 
-As mentioned before, the amount of time AWS AppConfig monitors CloudWatch for alerts and rollback if there are any. It could be 10 minutes, 3 hours, or completely skipped.
+The amount of time AWS AppConfig monitors CloudWatch for alerts and rollback if there are any. It could be 10 minutes, a day, or completely skipped.
 
 ### Resource
 
