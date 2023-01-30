@@ -21,7 +21,7 @@ We have a web app that displays cat photos. We want to also show dog photos, but
 
 ### Creating and deploying a configuration
 
-Here we'll create the feature flag with the name `dogs_view` that's off by default.
+Here we'll create the feature flag with the name `dogs_panel` that's off by default.
 
 #### Create the app
 
@@ -63,7 +63,7 @@ Select the Quick deployment strategy and proceed to deploy.
 
 ### Getting the configurations in the client
 
-[Link for the client or web app](https://aws-appconfig.vercel.app/) (_the feature flag is on_), **Let me know when you open it, so I can switch the feature off.**
+[Link for the client or web app](https://aws-appconfig.vercel.app/) (_the feature flag is off_), **Let me know when you open it, so I can switch the feature on.**
 
 We'll use [`@aws-sdk/client-appconfigdata`](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-appconfigdata/index.html#description) to retrieve the configurations. Here's an example with Next.js.
 
@@ -162,7 +162,7 @@ const fetcher = (...args) => fetch(...args).then((res) => res.json())
 
 type Config = {
   config: {
-    dogs_view: {
+    dogs_panel: {
       enabled: boolean
     }
   }
@@ -177,7 +177,7 @@ export default function Home() {
     return <h1>Something went wrong, check the console</h1>
   }
 
-  const canViewDogs = data?.config?.dogs_view?.enabled
+  const canViewDogs = data?.config?.dogs_panel?.enabled
 
   let view = (
     <div>
@@ -255,11 +255,13 @@ It defines the growth type of how a configuration update is rolled out.
 
 For this type, AWS AppConfig processes the deployment by increments of the growth factor evenly distributed over the deployment. For example, a linear deployment that uses a step percentage of 20 initially makes the configuration available to 20 percent of the targets. After 1/5th of the deployment time has passed, the system updates the percentage to 40 percent. This continues until 100% of the targets are set to receive the deployed configuration.
 
+The term "target" refers to your resource, in the above example, a web application that fetches configuration data from AWS AppConfig. When deploying a configuration, the growth factor and growth type determine how the configuration is distributed to the targets. In the example, with a growth factor of 50% and linear growth type, the first web application that fetches the configuration will receive the new data, while the second web application may not. The distribution of targets is unpredictable and I think it depends on the [IP address of the targets](https://repost.aws/questions/QUh51u1aXUQG65IYbQRhkI0A/how-does-app-config-service-figure-out-the-targets-for-a-deployment) _(based on my observations)_.
+
 ### Exponential
 
 For this type, AWS AppConfig processes the deployment exponentially using the following formula: `G*(2^N)`. In this formula, `G` is the step percentage specified by the user and `N` is the number of steps until the configuration is deployed to all targets.
 
-Example if the growth factor is 4:
+Example if the growth factor is 2:
 
 ```
 2*(2^0)
@@ -269,7 +271,7 @@ Example if the growth factor is 4:
 
 ### Bake time
 
-The amount of time AWS AppConfig monitors CloudWatch for alerts and rollback if there are any. It could be 10 minutes, a day, or completely skipped.
+The amount of time AWS AppConfig monitors CloudWatch for alerts and rollback if there are any. It could be 10 minutes, 1440 minutes/hours, or completely skipped.
 
 ### Resource
 
