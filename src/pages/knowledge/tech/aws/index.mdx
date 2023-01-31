@@ -1,0 +1,47 @@
+---
+title: AWS Index
+path: /knowledge/tech/aws
+date: 2023-01-31
+---
+
+import MarkdownWrapper from '../../../../components/MarkdownWrapper'
+import Layout from '../../../../components/Layout'
+
+<Layout title={props.pageContext.frontmatter.title} location={props.path}>
+<MarkdownWrapper>
+
+# AWS — Index
+
+## Resources
+
+Links from the resources in all AWS documents.
+
+### AWS CLI
+
+- [Configuring the CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-quickstart.html#cli-configure-quickstart-creds)
+
+### AWS API Gateway
+
+- [Main docs](https://docs.aws.amazon.com/apigateway/latest/developerguide/welcome.html)
+- [REST API VS HTTP API](https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-vs-rest.html)
+- [Mapping templates & Models](https://docs.aws.amazon.com/apigateway/latest/developerguide/models-mappings.html#models-mappings-mappings)
+- [Method response type](https://www.any-api.com/amazonaws_com/apigateway/docs/Definitions/MethodResponse)
+
+### AWS CDK
+
+- [AWS CDK — Getting Started](https://docs.aws.amazon.com/cdk/v2/guide/getting_started.html#getting_started_concepts)
+- [CloudFormation vs CDK](https://www.tinystacks.com/blog-post/aws-cdk-vs-cloudformation/)
+- [API Gateway example](https://bobbyhadz.com/blog/aws-cdk-http-api-apigateway-v2-example)
+- [Lambda Function Example](https://bobbyhadz.com/blog/aws-cdk-typescript-lambda)
+- [TypeScript examples](https://github.com/aws-samples/aws-cdk-examples/tree/master/typescript)
+
+### AWS AppConfig
+
+- [Userguide](https://docs.aws.amazon.com/appconfig/latest/userguide/what-is-appconfig.html)
+- [Lambda Function Feature Flags](https://www.youtube.com/watch?v=sq2HcRMLaLU)
+- [AWS Blog about setting up AppConfig and its benefits](https://aws.amazon.com/blogs/aws/safe-deployment-of-application-configuration-settings-with-aws-appconfig/)
+- [AWS SDK API](https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-appconfigdata/index.html)
+- [Deprecated GetConfiguration](https://docs.aws.amazon.com/appconfig/2019-10-09/APIReference/API_GetConfiguration.html)
+
+</MarkdownWrapper>
+</Layout>
