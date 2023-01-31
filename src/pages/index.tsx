@@ -2,22 +2,8 @@ import React from 'react'
 import { graphql, Link, useStaticQuery } from 'gatsby'
 import styled from 'styled-components'
 import MarkdownWrapper from '../components/MarkdownWrapper'
-import { GlobalHead } from '../utils/GlobalHead'
-
-const HeadingStyled = styled.h1`
-  border-bottom: 3px solid;
-  padding-bottom: 10px;
-  color: dodgerblue;
-`
-
-const AnchorMDX = styled.a`
-  color: #527dc9;
-  text-decoration: none;
-
-  &:hover {
-    text-decoration: underline;
-  }
-`
+import Layout from '../components/Layout'
+import { Typography, Link as MuiLink } from '@mui/material'
 
 const ListStyled = styled.ul`
   display: flex;
@@ -58,19 +44,26 @@ const IndexPage = () => {
   const mapPagesToElements = nodes.map((page: MDXpage) => {
     return (
       <Link to={page.slug}>
-        <AnchorMDX>{page.frontmatter.title}</AnchorMDX>
+        <MuiLink
+          style={{
+            color: '#e7a63c',
+            textDecorationColor: '#b37f2c',
+          }}
+        >
+          {page.frontmatter.title}
+        </MuiLink>
       </Link>
     )
   })
 
   return (
     <>
-      <GlobalHead title="Knowledge Home">
+      <Layout title="Knowledge Home">
         <MarkdownWrapper>
-          <HeadingStyled>Available pages</HeadingStyled>
+          <Typography variant="h4">Available pages</Typography>
           <ListStyled>{mapPagesToElements}</ListStyled>
         </MarkdownWrapper>
-      </GlobalHead>
+      </Layout>
     </>
   )
 }
