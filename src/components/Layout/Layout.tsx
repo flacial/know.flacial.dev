@@ -2,6 +2,10 @@ import React, { PropsWithChildren, ReactElement } from 'react'
 import { MDXProvider } from '@mdx-js/react'
 import styled from 'styled-components'
 import vsLight from 'prism-react-renderer/themes/nightOwl'
+import Highlight, { defaultProps } from 'prism-react-renderer'
+import { GlobalHead } from '../../utils/GlobalHead'
+import Breadcrumb from '../Breadcrumb/Breadcrumb'
+import { ThemeProvider, createTheme } from '@mui/material'
 import './layout.css'
 
 const H1Styled = styled.h1`
@@ -50,10 +54,6 @@ const AnchorMDX = styled.a`
   }
 `
 
-import Highlight, { defaultProps } from 'prism-react-renderer'
-import { graphql } from 'gatsby'
-import { GlobalHead } from '../../utils/GlobalHead'
-
 const component = {
   pre: (props: ReactElement['props']) => {
     const className = props.children.props.className || ''
@@ -96,26 +96,46 @@ const CustomAnchorMDX = (props: ReactElement['props']) => (
   <AnchorMDX {...props} target="_blank" />
 )
 
-const Layout: React.FC<PropsWithChildren<{ title: string }>> = ({
-  children,
-  title,
-}) => {
+const LayoutContainer = styled.div`
+  display: grid;
+  justify-content: center;
+  margin: 100px 50px;
+`
+
+const theme = createTheme({
+  typography: {
+    fontFamily: ['-apple-system', 'Inter', 'Roboto'].join(','),
+  },
+  palette: {
+    text: {
+      primary: '#d3d3d3',
+      secondary: '#afafaf',
+    },
+  },
+})
+
+const Layout: React.FC<
+  PropsWithChildren<{ title: string; location?: any }>
+> = ({ children, title, location }) => {
   return (
-    <>
+    <LayoutContainer>
       <GlobalHead title={title}>
-        <MDXProvider
-          components={{
-            pre: component.pre,
-            code: CodeMDX,
-            inlineCode: InlineCodeMDX,
-            a: CustomAnchorMDX,
-            h1: H1Styled,
-          }}
-        >
-          {children}
-        </MDXProvider>
+        <ThemeProvider theme={theme}>
+          <Breadcrumb location={location} />
+          <MDXProvider
+            components={{
+              pre: component.pre,
+              code: CodeMDX,
+              inlineCode: InlineCodeMDX,
+              a: CustomAnchorMDX,
+              h1: H1Styled,
+            }}
+          >
+            {children}
+          </MDXProvider>
+        </ThemeProvider>
       </GlobalHead>
-    </>
+    </LayoutContainer>
   )
 }
 

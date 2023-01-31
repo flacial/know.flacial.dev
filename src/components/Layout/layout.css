@@ -50,8 +50,6 @@ p:has(strong) {
 ul,
 ol {
   padding-left: 25px;
-  display: flex;
-  flex-direction: column;
   row-gap: 6px;
 }
 
