@@ -5,7 +5,11 @@ const MainStyled = styled.main`
   font-family: Inter;
   display: grid;
   justify-content: center;
-  color: hsl(0, 0%, 25.098039215686274%);
+  page-break-inside: avoid;
+  max-width: 100%;
+  overflow: auto;
+  display: block;
+  word-wrap: break-word;
 `
 const MinContainerStyled = styled.div`
   max-width: 780px;
@@ -13,10 +17,8 @@ const MinContainerStyled = styled.div`
 
 const MarkdownWrapper: React.FC<PropsWithChildren> = ({ children }) => {
   return (
-      <MainStyled>
-          <MinContainerStyled>
-            {children}
-          </MinContainerStyled>
+    <MainStyled>
+      <MinContainerStyled>{children}</MinContainerStyled>
     </MainStyled>
   )
 }
