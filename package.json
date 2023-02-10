@@ -31,6 +31,7 @@
     "gatsby-plugin-sharp": "^4.19.0",
     "gatsby-plugin-sitemap": "^5.19.0",
     "gatsby-plugin-styled-components": "^5.19.0",
+    "gatsby-remark-autolink-headers": "5.5.0",
     "gatsby-remark-images": "6",
     "gatsby-source-filesystem": "^4.19.0",
     "gatsby-transformer-remark": "5",

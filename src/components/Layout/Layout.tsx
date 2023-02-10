@@ -92,14 +92,20 @@ const component = {
 
 const CodeMDX = (props: ReactElement['props']) => <CodeStyled {...props} />
 
-const CustomAnchorMDX = (props: ReactElement['props']) => (
-  <AnchorMDX {...props} target="_blank" />
-)
+const CustomAnchorMDX = (props: ReactElement['props']) => {
+  const isLocalAnchor = props?.className?.includes('anchor')
+
+  return <AnchorMDX {...props} target={isLocalAnchor ? '_self' : '_blank'} />
+}
 
 const LayoutContainer = styled.div`
   display: grid;
   justify-content: center;
   margin: 100px 50px;
+`
+
+const BreadCrumbContainer = styled.div`
+  padding-left: 30px;
 `
 
 const theme = createTheme({
@@ -121,7 +127,9 @@ const Layout: React.FC<
     <LayoutContainer>
       <GlobalHead title={title}>
         <ThemeProvider theme={theme}>
-          <Breadcrumb location={location} />
+          <BreadCrumbContainer>
+            <Breadcrumb location={location} />
+          </BreadCrumbContainer>
           <MDXProvider
             components={{
               pre: component.pre,

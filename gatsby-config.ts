@@ -52,17 +52,20 @@ const config: GatsbyConfig = {
               maxWidth: 1200,
             },
           },
+          `gatsby-remark-autolink-headers`,
         ],
+        plugins: [`gatsby-remark-autolink-headers`],
       },
     },
     {
       resolve: `gatsby-transformer-remark`,
       options: {
         plugins: [
+          `gatsby-remark-autolink-headers`,
           {
             resolve: `gatsby-remark-images`,
             options: {
-              maxWidth: 800,
+              maxWidth: 1200,
             },
           },
         ],

@@ -3,6 +3,10 @@ body {
   background-color: #1c2127;
 }
 
+a.anchor {
+  fill: white;
+}
+
 h2 {
   font-size: 1.4em;
 }

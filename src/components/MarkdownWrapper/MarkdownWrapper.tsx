@@ -10,6 +10,7 @@ const MainStyled = styled.main`
   overflow: auto;
   display: block;
   word-wrap: break-word;
+  padding-left: 30px;
 `
 const MinContainerStyled = styled.div`
   max-width: 780px;
