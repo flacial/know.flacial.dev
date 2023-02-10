@@ -1,0 +1,107 @@
+---
+title: AWS IAM
+path: /knowledge/tech/aws
+date: 2023-02-10
+---
+
+import MarkdownWrapper from '../../../../components/MarkdownWrapper'
+import Layout from '../../../../components/Layout'
+
+<Layout title={props.pageContext.frontmatter.title} location={props.path}>
+<MarkdownWrapper>
+
+# AWS IAM
+
+## AWS Identity and Access Management (IAM)
+
+AWS IAM is a service that enables you to manage access to AWS resources. IAM enables you to securely control access to AWS services and resources for your users. In this document, we'll discuss the major components and concepts of IAM and how they work together to help you manage access to your resources.
+
+### Principal
+
+A principal is an entity that tries to perform an action on an AWS resource. Principals can be AWS accounts, IAM roles, IAM users, or federated SAML users.
+
+[Read more about Principals](./iam-principal)
+
+### Authentication
+
+Authentication is the process of confirming the identity of the principal trying to access AWS resources. IAM uses AWS credentials, such as an AWS access key ID and secret access key, to verify the identity of the principal.
+
+### Authorization
+
+Authorization is the process of determining what actions the authenticated principal can perform on a given AWS resource. This determination is based on the policies that are associated with the principal.
+
+### Actions
+
+Actions are the operations that can be performed on AWS resources. IAM policies define which actions a principal is allowed to perform.
+
+For example, a policy might allow a principal to create an Amazon S3 bucket or delete an Amazon S3 object.
+
+### Resources
+
+Resources are the AWS resources that can be acted upon. A resource can be a specific Amazon S3 bucket, an Amazon EC2 instance, or an Amazon SNS topic, for example.
+
+## Components of IAM
+
+### Users
+
+Users are AWS entities that represent people or applications that interact with AWS. Each user in your AWS account has a unique AWS access key ID and secret access key, which are used to sign programmatic requests to AWS.
+
+### Groups
+
+Groups are collections of IAM users. You can use groups to manage the policies for multiple users at once. For example, you might create a group for testers and a group for engineers, and assign different policies to each group.
+
+### Roles
+
+A role is an AWS Identity and Access Management (IAM) entity that defines a set of permissions for making AWS service requests. Roles can be assigned to AWS resources, such as EC2 instances, or to AWS Identity and Access Management (IAM) users in your account.
+
+For example, you might create a role that allows an EC2 instance to access an Amazon S3 bucket, or you might create a role that allows an IAM user to assume the role of an administrator by elevating their permissions.
+
+### Policies
+
+Policies are JSON objects that define the rights of an entity or resource when associated with it. Policies are created and linked to IAM entities, such as users, groups, or roles. The policy's permissions determine whether a request should be approved or rejected.
+
+## Advanced Usage
+
+IAM can be used for advanced scenarios, such as enforcing multi-factor authentication (MFA) for accessing AWS resources. For example, you could create a policy that requires an MFA token to be provided before a user is allowed to access an Amazon S3 bucket. This could be achieved using [conditions](https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_elements_condition.html) when creating the policy for a role:
+
+```json
+{
+  "Id": "Policy1676027581647",
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "Stmt1676027579972",
+      "Action": "s3:*",
+      "Effect": "Deny",
+      "Resource": "arn:aws:s3::{ID}",
+      "Condition": {
+        "BoolIfExists": {
+          "aws:MultiFactorAuthPresent": "false"
+        }
+      },
+      "Principal": "*"
+    }
+  ]
+}
+```
+
+## Resources
+
+- [AWS Identity and Access Management (IAM)](https://aws.amazon.com/iam)
+  - This page provides an overview of IAM and explains its core concepts, components, and features.
+- [Principal](https://docs.aws.amazon.com/IAM/latest/UserGuide/intro-structure.html#intro-structure-principal)
+  - This page explains what a principal is in the context of IAM and provides examples of different types of principals in AWS.
+- [IAM Users](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users.html)
+  - This page provides information on how to create and manage IAM users in your AWS account.
+- [IAM Groups](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_groups.html)
+  - This page provides information on how to create and manage IAM groups in your AWS account.
+- [IAM Roles](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html)
+  - This page provides information on how to create and manage IAM roles in your AWS account, as well as how to use roles to delegate access to AWS resources.
+- [IAM Policies](https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies.html)
+  - This page provides information on how to create and manage IAM policies in your AWS account, including how to define policy permissions and how to attach policies to IAM entities.
+- [IAM best practices](https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html)
+  - This page provides information on the best practices of IAM.
+- [IAM Overview video](https://www.youtube.com/watch?v=o0p04B7-NFY)
+
+</MarkdownWrapper>
+</Layout>
