@@ -10,6 +10,7 @@ const MainStyled = styled.main`
   overflow: auto;
   display: block;
   word-wrap: break-word;
+  // for the headings bookmark icon to appear
   padding-left: 30px;
 `
 const MinContainerStyled = styled.div`
