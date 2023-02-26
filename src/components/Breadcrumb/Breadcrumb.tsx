@@ -2,6 +2,9 @@ import React from 'react'
 import Breadcrumbs from '@mui/material/Breadcrumbs'
 import Typography from '@mui/material/Typography'
 import Link from '@mui/material/Link'
+import Tooltip from '@mui/material/Tooltip'
+
+const INACTIVE_PAGES = ['knowledge', 'tech']
 
 const Breadcrumb = ({ location }: { location?: string }) => {
   const Home = (
@@ -23,15 +26,28 @@ const Breadcrumb = ({ location }: { location?: string }) => {
       )
     }
 
+    const currentPage = value.at(-1) || ''
+
     return (
-      <Link
-        underline="hover"
-        key={i + 1}
-        color="text.secondary"
-        href={value.join('/')}
-      >
-        {e}
-      </Link>
+      <Tooltip title="Not available yet">
+        <div
+          {...(INACTIVE_PAGES.includes(currentPage) && {
+            style: { cursor: 'not-allowed' },
+          })}
+        >
+          <Link
+            {...(INACTIVE_PAGES.includes(currentPage) && {
+              style: { pointerEvents: 'none' },
+            })}
+            underline="hover"
+            key={i + 1}
+            color="text.secondary"
+            href={value.join('/')}
+          >
+            {e}
+          </Link>
+        </div>
+      </Tooltip>
     )
   }
 
