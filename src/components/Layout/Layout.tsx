@@ -7,6 +7,7 @@ import { GlobalHead } from '../../utils/GlobalHead'
 import Breadcrumb from '../Breadcrumb/Breadcrumb'
 import { ThemeProvider, createTheme } from '@mui/material'
 import './layout.css'
+import { Link } from 'gatsby'
 
 const H1Styled = styled.h1`
   border-bottom: 3px solid;
@@ -92,19 +93,32 @@ const component = {
 
 const CodeMDX = (props: ReactElement['props']) => <CodeStyled {...props} />
 
-const CustomAnchorMDX = (props: ReactElement['props']) => {
-  const isLocalAnchor = props?.className?.includes('anchor')
+export const CustomAnchorMDX = (props: ReactElement['props']) => {
+  const isLocalAnchor =
+    props?.className?.includes('anchor') || !props.href.includes('://')
+  // _self means the link is a bookmark link or local link to different page
+  // _blank means the link is external
+  const target = isLocalAnchor ? '_self' : '_blank'
 
-  return <AnchorMDX {...props} target={isLocalAnchor ? '_self' : '_blank'} />
+  const Element = (props: any) => {
+    return isLocalAnchor ? (
+      <Link className="local-anchor" to={props.href} {...props} />
+    ) : (
+      <AnchorMDX {...props} />
+    )
+  }
+
+  return <Element {...props} target={target} />
 }
 
 const LayoutContainer = styled.div`
   display: grid;
   justify-content: center;
-  margin: 100px 50px;
+  margin: calc(1vh * 8) calc(1vw * 2);
 `
 
 const BreadCrumbContainer = styled.div`
+  // for the headings bookmark icon to appear
   padding-left: 30px;
 `
 
